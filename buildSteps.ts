@@ -9,12 +9,12 @@
 // Start, Playing, Won, Lost, Pause
 
 
-// []: Create game
-// []: Display cards
-// []: Implement select cards
-// []: Match cards function
-// []: Implement game timer
-// []: Implement reset game
+// [X]: Create game
+// [X]: Display cards
+// [X]: Implement select cards
+// [X]: Match cards function
+// [X]: Implement game timer
+// [X]: Implement reset game
 // []: Flip card animation
 // []: Pausing game
 // []: Ability to choose emoji categories

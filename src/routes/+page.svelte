@@ -2,15 +2,18 @@
 	import '../app.css';
 	import { emojis } from '$lib/emojis';
 
-	type State = 'Start' | 'Playing' | 'Won' | 'Lost' | 'Pause';
+	type State = 'start' | 'playing' | 'won' | 'lost' | 'pause';
 
-	let state: State = 'Playing';
+	let state: State = 'won';
 
 	let size = 20;
 	let grid = createGrid();
 	let maxMatches = grid.length / 2;
 	let selected: number[] = [];
 	let matches: string[] = [];
+
+	let timerID: number | null = null;
+	let time = 60;
 
 	function createGrid(): string[] {
 		let cards = new Set<string>();
@@ -29,6 +32,14 @@
 		return array.sort(() => Math.random() - 0.5);
 	}
 
+	function startGameTimer() {
+		function countDown() {
+			state === 'playing' && (time -= 1);
+		}
+
+		timerID = setInterval(countDown, 1000);
+	}
+
 	function selectCard(cardIndex: number): void {
 		selected = selected.concat(cardIndex);
 	}
@@ -45,19 +56,39 @@
 	}
 
 	function gameWon() {
-		state === 'Won';
+		state = 'won';
+		resetGame();
+	}
+
+	function gameLost() {
+		state = 'lost';
+		resetGame();
+	}
+
+	function resetGame() {
+		timerID && clearInterval(timerID);
+		grid = createGrid();
+		maxMatches = grid.length / 2;
+		selected = [];
+		matches = [];
+		timerID = null;
+		time = 60;
 	}
 
 	$: selected.length === 2 && matchCards();
 	$: maxMatches === matches.length && gameWon();
+	$: state === 'playing' && !timerID && startGameTimer();
+	$: time === 0 && gameLost();
 </script>
 
-{#if state === 'Start'}
+{#if state === 'start'}
 	<h1>Matching Game</h1>
-	<button on:click={() => state === 'Playing'}>Play</button>
+	<button on:click={() => (state = 'playing')}>Play</button>
 {/if}
 
-{#if state === 'Playing'}
+{#if state === 'playing'}
+	<h1 class="timer" class:pulse={time < 10}>{time}</h1>
+
 	<div class="matches">
 		{#each matches as match}
 			<div>{match}</div>
@@ -67,8 +98,8 @@
 	<div class="cards">
 		{#each grid as card, cardIndex}
 			{@const isSelected = selected.includes(cardIndex)}
-			{@const isSelectedOrMatch = isSelected || matches.includes(card)}
 			{@const match = matches.includes(card)}
+			{@const isSelectedOrMatch = isSelected || match}
 
 			<button
 				class="card"
@@ -82,17 +113,17 @@
 	</div>
 {/if}
 
-{#if state === 'Won'}
+{#if state === 'won'}
 	<h1>You win! 🏆</h1>
-	<button on:click={() => state === 'Playing'}>Play again</button>
+	<button on:click={() => (state = 'playing')}>Play again</button>
 {/if}
 
-{#if state === 'Lost'}
+{#if state === 'lost'}
 	<h1>You loose! 💩</h1>
-	<button on:click={() => state === 'Playing'}>Play again</button>
+	<button on:click={() => (state = 'playing')}>Play again</button>
 {/if}
 
-{#if state === 'Pause'}
+{#if state === 'pause'}
 	<!-- Todo -->
 {/if}
 
@@ -126,5 +157,20 @@
 		gap: 1rem;
 		margin-block: 2rem;
 		font-size: 3rem;
+	}
+
+	.timer {
+		transition: color 0.3 ease;
+	}
+
+	.pulse {
+		color: var(--pulse);
+		animation: pulse 1s infinite ease;
+	}
+
+	@keyframes pulse {
+		to {
+			scale: 1.4;
+		}
 	}
 </style>
