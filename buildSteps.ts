@@ -17,5 +17,7 @@
 // [X]: Implement reset game
 // [X]: Flip card animation
 // [X]: Pausing game
-// []: Refactor to components
+// [X]: Refactor to components
 // []: Ability to choose emoji categories
+
+

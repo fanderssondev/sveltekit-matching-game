@@ -9,7 +9,6 @@
 </script>
 
 <button
-	class="card"
 	class:selected={isSelected}
 	class:flip={isSelectedOrMatch}
 	disabled={isSelectedOrMatch}
@@ -19,7 +18,7 @@
 </button>
 
 <style>
-	.card {
+	button {
 		--size: 140px;
 
 		height: var(--size);
@@ -37,19 +36,19 @@
 			rotate: y 180deg;
 			pointer-events: none;
 		}
+	}
 
-		& .back {
-			position: absolute;
-			inset: 0;
-			display: grid;
-			place-content: center;
-			backface-visibility: hidden;
-			rotate: y 180deg;
-		}
+	.back {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-content: center;
+		backface-visibility: hidden;
+		rotate: y 180deg;
+	}
 
-		& .match {
-			transition: opacity 0.3s ease-out;
-			opacity: 0.5;
-		}
+	.match {
+		transition: opacity 0.3s ease-out;
+		opacity: 0.5;
 	}
 </style>

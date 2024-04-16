@@ -5,7 +5,9 @@
 <h1 class="timer" class:pulse={time < 10}>{time}</h1>
 
 <style>
-	.timer {
+	h1 {
+		width: max-content;
+		margin: 0 auto;
 		transition: color 0.3 ease;
 	}
 

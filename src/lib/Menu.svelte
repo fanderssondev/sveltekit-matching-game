@@ -6,6 +6,3 @@
 
 <h1><slot /></h1>
 <button on:click={() => setState(newState)}>{btnText}</button>
-
-<style>
-</style>
