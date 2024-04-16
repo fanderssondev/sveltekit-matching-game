@@ -7,10 +7,11 @@
 	import Matches from '$lib/Matches.svelte';
 
 	let state: State = 'start';
+	let difficulty: Difficulty;
 
 	let size = 20;
-	let grid = createGrid();
-	let maxMatches = grid.length / 2;
+	let grid: string[];
+	let maxMatches = size / 2;
 	let selected: number[] = [];
 	let matches: string[] = [];
 
@@ -21,6 +22,7 @@
 		let cards = new Set<string>();
 
 		let maxSize = size / 2;
+		console.log(maxSize);
 
 		while (cards.size < maxSize) {
 			const randomIndex = Math.floor(Math.random() * emojis.length);
@@ -70,7 +72,7 @@
 	function resetGame(): void {
 		timerID && clearInterval(timerID);
 		grid = createGrid();
-		maxMatches = grid.length / 2;
+		maxMatches = size / 2;
 		selected = [];
 		matches = [];
 		timerID = null;
@@ -90,6 +92,22 @@
 		}
 	}
 
+	function setDifficulty(level: Difficulty): void {
+		switch (level) {
+			case 'easy':
+				size = 12;
+				break;
+			case 'medium':
+				size = 20;
+				break;
+			case 'hard':
+				size = 30;
+				break;
+		}
+		grid = createGrid();
+		state = 'playing';
+	}
+
 	function setState(newState: State): void {
 		state = newState;
 	}
@@ -103,7 +121,14 @@
 <svelte:window on:keydown={pauseGame} />
 
 {#if state === 'start'}
-	<Menu {setState} newState={'playing'} btnText={'Play'}>Matching Game</Menu>
+	<!-- <Menu {setState} newState={'playing'} btnText={'Play'}>Matching Game</Menu> -->
+	<h1>Matching Game</h1>
+	<h2>Choose difficulty</h2>
+	<div class="btn-group">
+		<button on:click={() => setDifficulty('easy')}>Easy</button>
+		<button on:click={() => setDifficulty('medium')}>Medium</button>
+		<button on:click={() => setDifficulty('hard')}>Hard</button>
+	</div>
 {/if}
 
 {#if state === 'playing'}
@@ -111,7 +136,7 @@
 
 	<Matches {matches} />
 
-	<div class="cards">
+	<div class="cards" style="--rowSize: 5;">
 		{#each grid as card, cardIndex}
 			{@const isSelected = selected.includes(cardIndex)}
 			{@const match = matches.includes(card)}
@@ -136,7 +161,24 @@
 <style>
 	.cards {
 		display: grid;
-		grid-template-columns: repeat(5, 1fr);
+		grid-template-columns: repeat(var(--rowSize, 5), 1fr);
 		gap: 0.4rem;
+	}
+
+	h2 {
+		font-size: 1.25rem;
+		padding-top: 2rem;
+	}
+
+	.btn-group {
+		display: flex;
+		gap: 1rem;
+	}
+
+	button {
+		width: max-content;
+		margin-top: 1rem;
+		margin-inline: auto;
+		border: 4px solid var(--border);
 	}
 </style>

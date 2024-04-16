@@ -18,6 +18,5 @@
 // [X]: Flip card animation
 // [X]: Pausing game
 // [X]: Refactor to components
+// []: Add difficulty levels
 // []: Ability to choose emoji categories
-
-

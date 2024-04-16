@@ -9,6 +9,7 @@ declare global {
       // interface Platform {}
    }
    type State = 'start' | 'playing' | 'won' | 'lost' | 'paused';
+   type Difficulty = 'easy' | 'medium' | 'hard';
 }
 
 export {};
