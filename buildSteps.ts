@@ -15,6 +15,7 @@
 // [X]: Match cards function
 // [X]: Implement game timer
 // [X]: Implement reset game
-// []: Flip card animation
-// []: Pausing game
+// [X]: Flip card animation
+// [X]: Pausing game
+// []: Refactor to components
 // []: Ability to choose emoji categories

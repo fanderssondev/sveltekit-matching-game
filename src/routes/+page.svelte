@@ -1,10 +1,12 @@
 <script lang="ts">
 	import '../app.css';
 	import { emojis } from '$lib/emojis';
+	import Card from '$lib/Card.svelte';
+	import Menu from '$lib/Menu.svelte';
+	import Timer from '$lib/Timer.svelte';
+	import Matches from '$lib/Matches.svelte';
 
-	type State = 'start' | 'playing' | 'won' | 'lost' | 'pause';
-
-	let state: State = 'won';
+	let state: State = 'start';
 
 	let size = 20;
 	let grid = createGrid();
@@ -32,7 +34,7 @@
 		return array.sort(() => Math.random() - 0.5);
 	}
 
-	function startGameTimer() {
+	function startGameTimer(): void {
 		function countDown() {
 			state === 'playing' && (time -= 1);
 		}
@@ -55,17 +57,17 @@
 		setTimeout(() => (selected = []), 300);
 	}
 
-	function gameWon() {
+	function gameWon(): void {
 		state = 'won';
 		resetGame();
 	}
 
-	function gameLost() {
+	function gameLost(): void {
 		state = 'lost';
 		resetGame();
 	}
 
-	function resetGame() {
+	function resetGame(): void {
 		timerID && clearInterval(timerID);
 		grid = createGrid();
 		maxMatches = grid.length / 2;
@@ -75,56 +77,60 @@
 		time = 60;
 	}
 
+	function pauseGame(e: KeyboardEvent): void {
+		if (e.key === 'Escape') {
+			switch (state) {
+				case 'playing':
+					state = 'paused';
+					break;
+				case 'paused':
+					state = 'playing';
+					break;
+			}
+		}
+	}
+
+	function setState(newState: State): void {
+		state = newState;
+	}
+
 	$: selected.length === 2 && matchCards();
 	$: maxMatches === matches.length && gameWon();
 	$: state === 'playing' && !timerID && startGameTimer();
 	$: time === 0 && gameLost();
 </script>
 
+<svelte:window on:keydown={pauseGame} />
+
 {#if state === 'start'}
-	<h1>Matching Game</h1>
-	<button on:click={() => (state = 'playing')}>Play</button>
+	<Menu {setState} newState={'playing'} btnText={'Play'}>Matching Game</Menu>
 {/if}
 
 {#if state === 'playing'}
-	<h1 class="timer" class:pulse={time < 10}>{time}</h1>
+	<Timer {time} />
 
-	<div class="matches">
-		{#each matches as match}
-			<div>{match}</div>
-		{/each}
-	</div>
+	<Matches {matches} />
 
 	<div class="cards">
 		{#each grid as card, cardIndex}
 			{@const isSelected = selected.includes(cardIndex)}
 			{@const match = matches.includes(card)}
-			{@const isSelectedOrMatch = isSelected || match}
 
-			<button
-				class="card"
-				class:selected={isSelected}
-				disabled={isSelectedOrMatch}
-				on:click={() => selectCard(cardIndex)}
-			>
-				<div class:match>{card}</div>
-			</button>
+			<Card {card} {isSelected} {match} {selectCard} {cardIndex} />
 		{/each}
 	</div>
 {/if}
 
 {#if state === 'won'}
-	<h1>You win! 🏆</h1>
-	<button on:click={() => (state = 'playing')}>Play again</button>
+	<Menu {setState} newState={'playing'} btnText={'Play again'}>You win! 🏆</Menu>
 {/if}
 
 {#if state === 'lost'}
-	<h1>You loose! 💩</h1>
-	<button on:click={() => (state = 'playing')}>Play again</button>
+	<Menu {setState} newState={'playing'} btnText={'Play again'}>You loose! 💩</Menu>
 {/if}
 
-{#if state === 'pause'}
-	<!-- Todo -->
+{#if state === 'paused'}
+	<Menu {setState} newState={'playing'} btnText={'Continue'}>Game Paused!</Menu>
 {/if}
 
 <style>
@@ -132,45 +138,5 @@
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
 		gap: 0.4rem;
-	}
-
-	.card {
-		--size: 140px;
-
-		height: var(--size);
-		aspect-ratio: 1;
-		font-size: 4rem;
-		background-color: var(--bg-2);
-
-		&.selected {
-			border: 4px solid var(--border);
-		}
-
-		& .match {
-			transition: opacity 0.3s ease-out;
-			opacity: 0.3;
-		}
-	}
-
-	.matches {
-		display: flex;
-		gap: 1rem;
-		margin-block: 2rem;
-		font-size: 3rem;
-	}
-
-	.timer {
-		transition: color 0.3 ease;
-	}
-
-	.pulse {
-		color: var(--pulse);
-		animation: pulse 1s infinite ease;
-	}
-
-	@keyframes pulse {
-		to {
-			scale: 1.4;
-		}
 	}
 </style>
